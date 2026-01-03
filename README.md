@@ -1,17 +1,20 @@
 # kafka-crash-course
+based on
+- https://gitlab.com/twn-youtube/kafka-crash-course
+- https://www.youtube.com/watch?v=B7CwU_tNYIE
 
-## Voraussetzungen
-- Python ist installiert
-- Docker Desktop (mit Docker und Docker Compose) ist installiert
+## Prerequisites
+- Python is installed
+- Docker Desktop (with Docker and Docker Compose) is installed
 
 ### Install confluent-kafka dependency
 `pip3 install confluent-kafka`
 
-## Start von Docker Compose
-(mit den definierten Docker Image und Volume)  
+## Starting Docker Compose
+(with the defined Docker image and volume)  
 `docker compose up -d`  
 `docker compose ps` # check  
-`docker compose down -v` # wenn man später Docker Compose wieder stoppen möchte
+`docker compose down -v` # if you want to stop Docker Compose later
 
 ### Validate that the topic was created in kafka container
 `docker exec -it kafka kafka-topics --list --bootstrap-server localhost:9092`
@@ -22,6 +25,6 @@
 ### View all events in a topic
 `docker exec -it kafka kafka-console-consumer --bootstrap-server localhost:9092 --topic orders --from-beginning`
 
-## Aufruf der Skripte
-`python .\producer.py -n 5` # erzeugt 5 zufällige Einträge in einem Kafka Topic ('orders')  
-`python .\tracker.py` # am besten in einem zweiten Terminal starten
+## Running the scripts
+`python .\producer.py -n 5` # generates 5 random entries into a Kafka topic ('orders')  
+`python .\tracker.py` # preferably start it in a second terminal
