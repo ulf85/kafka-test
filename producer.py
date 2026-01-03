@@ -1,3 +1,8 @@
+# producer.py
+# Script to send random order messages to a Kafka topic using confluent_kafka
+# Requires confluent_kafka library
+# Usage: python producer.py -n <number_of_orders> --delay <seconds_between_messages>
+
 import json
 import uuid
 import random
