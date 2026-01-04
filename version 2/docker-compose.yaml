@@ -1,0 +1,145 @@
+#version: '3.8'
+
+services:
+  # ----- Controllers (KRaft controllers only) -----
+  controller-1:
+    image: confluentinc/cp-kafka:7.8.3
+    container_name: controller-1
+    environment:
+      KAFKA_KRAFT_MODE: 'true'
+      CLUSTER_ID: '1L6g7nGhU-eAKfL--X25wo'
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@controller-1:9093,2@controller-2:9093,3@controller-3:9093'
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENERS: CONTROLLER://0.0.0.0:9093
+      KAFKA_LOG_DIRS: /var/lib/kafka/data
+    volumes:
+      - controller1_kraft:/var/lib/kafka/data
+    networks:
+      - kafka_net
+
+  controller-2:
+    image: confluentinc/cp-kafka:7.8.3
+    container_name: controller-2
+    environment:
+      KAFKA_KRAFT_MODE: 'true'
+      CLUSTER_ID: '1L6g7nGhU-eAKfL--X25wo'
+      KAFKA_NODE_ID: 2
+      KAFKA_PROCESS_ROLES: controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@controller-1:9093,2@controller-2:9093,3@controller-3:9093'
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENERS: CONTROLLER://0.0.0.0:9093
+      KAFKA_LOG_DIRS: /var/lib/kafka/data
+    volumes:
+      - controller2_kraft:/var/lib/kafka/data
+    networks:
+      - kafka_net
+
+  controller-3:
+    image: confluentinc/cp-kafka:7.8.3
+    container_name: controller-3
+    environment:
+      KAFKA_KRAFT_MODE: 'true'
+      CLUSTER_ID: '1L6g7nGhU-eAKfL--X25wo'
+      KAFKA_NODE_ID: 3
+      KAFKA_PROCESS_ROLES: controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@controller-1:9093,2@controller-2:9093,3@controller-3:9093'
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENERS: CONTROLLER://0.0.0.0:9093
+      KAFKA_LOG_DIRS: /var/lib/kafka/data
+    volumes:
+      - controller3_kraft:/var/lib/kafka/data
+    networks:
+      - kafka_net
+
+  # ----- Brokers (broker-only nodes) -----
+  broker-1:
+    image: confluentinc/cp-kafka:7.8.3
+    container_name: broker-1
+    ports:
+      - "9092:29092" # host:container (host 9092 -> container 29092)
+    environment:
+      KAFKA_KRAFT_MODE: 'true'
+      CLUSTER_ID: '1L6g7nGhU-eAKfL--X25wo'
+      KAFKA_NODE_ID: 10
+      KAFKA_PROCESS_ROLES: broker
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@controller-1:9093,2@controller-2:9093,3@controller-3:9093'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,PLAINTEXT_HOST://0.0.0.0:29092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker-1:9092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_LOG_DIRS: /var/lib/kafka/data
+    depends_on:
+      - controller-1
+      - controller-2
+      - controller-3
+    volumes:
+      - broker1_kraft:/var/lib/kafka/data
+    networks:
+      - kafka_net
+
+  broker-2:
+    image: confluentinc/cp-kafka:7.8.3
+    container_name: broker-2
+    ports:
+      - "9094:29092" # host:container (host 9094 -> container 29092)
+    environment:
+      KAFKA_KRAFT_MODE: 'true'
+      CLUSTER_ID: '1L6g7nGhU-eAKfL--X25wo'
+      KAFKA_NODE_ID: 11
+      KAFKA_PROCESS_ROLES: broker
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@controller-1:9093,2@controller-2:9093,3@controller-3:9093'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,PLAINTEXT_HOST://0.0.0.0:29092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker-2:9092,PLAINTEXT_HOST://localhost:9094
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_LOG_DIRS: /var/lib/kafka/data
+    depends_on:
+      - controller-1
+      - controller-2
+      - controller-3
+    volumes:
+      - broker2_kraft:/var/lib/kafka/data
+    networks:
+      - kafka_net
+
+  broker-3:
+    image: confluentinc/cp-kafka:7.8.3
+    container_name: broker-3
+    ports:
+      - "9096:29092" # host:container (host 9096 -> container 29092)
+    environment:
+      KAFKA_KRAFT_MODE: 'true'
+      CLUSTER_ID: '1L6g7nGhU-eAKfL--X25wo'
+      KAFKA_NODE_ID: 12
+      KAFKA_PROCESS_ROLES: broker
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@controller-1:9093,2@controller-2:9093,3@controller-3:9093'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,PLAINTEXT_HOST://0.0.0.0:29092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker-3:9092,PLAINTEXT_HOST://localhost:9096
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_LOG_DIRS: /var/lib/kafka/data
+    depends_on:
+      - controller-1
+      - controller-2
+      - controller-3
+    volumes:
+      - broker3_kraft:/var/lib/kafka/data
+    networks:
+      - kafka_net
+
+networks:
+  kafka_net:
+    driver: bridge
+
+volumes:
+  controller1_kraft:
+  controller2_kraft:
+  controller3_kraft:
+  broker1_kraft:
+  broker2_kraft:
+  broker3_kraft:
