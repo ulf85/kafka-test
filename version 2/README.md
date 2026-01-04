@@ -74,6 +74,10 @@ docker exec -it broker-1 bash -c "kafka-topics --create --topic test --bootstrap
 # Producer (in container, verbindet zu broker-1 intern):
 docker exec -it broker-1 bash -c "kafka-console-producer --bootstrap-server broker-1:9092 --topic test"
 
+# Python Tracker (vom Host):
+# python tracker.py  # verwendet standardmäßig bootstrap.servers=localhost:9092,localhost:9094,localhost:9096
+# Überschreiben: python tracker.py --bootstrap localhost:9092,localhost:9094,localhost:9096
+
 # Consumer (vom Host, Host-Port):
 # kafka-console-consumer --bootstrap-server localhost:9092 --topic test --from-beginning
 

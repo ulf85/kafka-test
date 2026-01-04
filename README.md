@@ -53,4 +53,8 @@ Use broker containers or the mapped host ports (broker-1 -> localhost:9092, brok
 `python .\producer.py -n 5 --replication-factor 2 --partitions 3` # create topic with specific replication/partitions if missing
 `python .\producer.py -n 5 --no-create-topic` # do not attempt to create topic
 `python .\producer.py -n 5 --delay 2 --bootstrap localhost:9092,localhost:9094,localhost:9096` # override bootstrap list explicitly
-`python .\tracker.py` # preferably start it in a second terminal
+
+`python .\tracker.py` # run the tracker (default bootstrap.servers=localhost:9092,localhost:9094,localhost:9096); start it in a second terminal
+`python .\tracker.py --bootstrap localhost:9092,localhost:9094,localhost:9096 --topic orders --offset-reset earliest` # override bootstrap/ topic/offset reset behavior
+
+Tip: both `producer.py` and `tracker.py` accept a `--bootstrap` option to provide multiple bootstrap servers for higher availability.
