@@ -56,23 +56,31 @@ docker logs -f broker-1
 7. Beispiel: Topic erstellen (Replication-Factor = 3):
 
 ```powershell
-# von innerhalb eines Broker-Containers
+# von innerhalb eines Broker-Containers (verwende container-internen Listener broker-1:9092)
 docker exec -it broker-1 bash -c "kafka-topics --create --topic test --bootstrap-server broker-1:9092 --partitions 3 --replication-factor 3"
 
-# alternativ, wenn du ein CLI lokal installiert hast:
+# alternativ, wenn du ein CLI lokal installiert hast (nutze den gemappten Host-Port):
 # kafka-topics --create --topic test --bootstrap-server localhost:9092 --partitions 3 --replication-factor 3
 ```
 
 8. Producer / Consumer testen:
 
 ```powershell
-# Producer (host oder mapped port)
-# lokal: kafka-console-producer --bootstrap-server localhost:9092 --topic test
-# in container:
+# Producer (vom Host, verwende gemappten Host-Port):
+# kafka-console-producer --bootstrap-server localhost:9092 --topic test
+# Python Producer (vom Host):
+# python producer.py -n 5  # verwendet standardmäßig bootstrap.servers=localhost:9092,localhost:9094,localhost:9096
+# Überschreiben: python producer.py -n 5 --bootstrap localhost:9092,localhost:9094,localhost:9096
+# Producer (in container, verbindet zu broker-1 intern):
 docker exec -it broker-1 bash -c "kafka-console-producer --bootstrap-server broker-1:9092 --topic test"
+
+# Consumer (vom Host, Host-Port):
+# kafka-console-consumer --bootstrap-server localhost:9092 --topic test --from-beginning
 
 # Consumer (in container):
 docker exec -it broker-1 bash -c "kafka-console-consumer --bootstrap-server broker-1:9092 --topic test --from-beginning"
+
+# Hinweis: Host-Ports sind: broker-1 -> localhost:9092, broker-2 -> localhost:9094, broker-3 -> localhost:9096
 ```
 
 ---

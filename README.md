@@ -16,16 +16,41 @@ based on
 `docker compose ps` # check  
 `docker compose down -v` # if you want to stop Docker Compose later
 
-### Validate that the topic was created in kafka container
+### Validate that the topic was created (single-node)
 `docker exec -it kafka kafka-topics --list --bootstrap-server localhost:9092`
 
-### Describe that topic and see its partitions
+### Describe that topic and see its partitions (single-node)
 `docker exec -it kafka kafka-topics --bootstrap-server localhost:9092 --describe --topic new_orders`
 
-### View all events in a topic
+### View all events in a topic (single-node)
 `docker exec -it kafka kafka-console-consumer --bootstrap-server localhost:9092 --topic orders --from-beginning`
 
+---
+
+### If you are using the `version 2` KRaft cluster (3 controllers, 3 brokers)
+Use broker containers or the mapped host ports (broker-1 -> localhost:9092, broker-2 -> localhost:9094, broker-3 -> localhost:9096).
+
+- List topics (inside a broker container):
+`docker exec -it broker-1 bash -c "kafka-topics --list --bootstrap-server broker-1:9092"`
+
+- List topics (from the host, with local Kafka CLI):
+`kafka-topics --list --bootstrap-server localhost:9092`
+
+- Describe a topic (inside a broker container):
+`docker exec -it broker-1 bash -c "kafka-topics --bootstrap-server broker-1:9092 --describe --topic new_orders"`
+
+- Describe a topic (from the host):
+`kafka-topics --bootstrap-server localhost:9092 --describe --topic new_orders`
+
+- View events in a topic (inside a broker container):
+`docker exec -it broker-1 bash -c "kafka-console-consumer --bootstrap-server broker-1:9092 --topic orders --from-beginning"`
+
+- View events in a topic (from the host):
+`kafka-console-consumer --bootstrap-server localhost:9092 --topic orders --from-beginning`
+
 ## Running the scripts
-`python .\producer.py -n 5` # generates 5 random entries into a Kafka topic ('orders') (default is 10)
-`python .\producer.py -n 5 --delay 2` # with additionally 2 seconds delay (default is 0.1)
+`python .\producer.py -n 5` # generates 5 random entries into a Kafka topic ('orders') (default is 10). When using the `version 2` cluster, the script defaults to multiple bootstrap servers: `localhost:9092,localhost:9094,localhost:9096` and will attempt to create the topic with replication-factor 3 if missing.
+`python .\producer.py -n 5 --replication-factor 2 --partitions 3` # create topic with specific replication/partitions if missing
+`python .\producer.py -n 5 --no-create-topic` # do not attempt to create topic
+`python .\producer.py -n 5 --delay 2 --bootstrap localhost:9092,localhost:9094,localhost:9096` # override bootstrap list explicitly
 `python .\tracker.py` # preferably start it in a second terminal
